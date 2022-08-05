@@ -61,7 +61,7 @@
             <el-button @click="toggleSelection()">取消选择</el-button>
           </div>
           <!-- 展示voter曾经投过的票 待实现-->
-          <div class="seeresult" v-show="checkvote">
+          <div class="seeresult" v-show="id == 2" @click="checkvote">
             <el-table :data="voteData" style="width: 100%">
               <el-table-column prop="surf_id" label="Id" width="180">
               </el-table-column>
@@ -74,7 +74,7 @@
             </el-table>
           </div>
           <!-- checkResult部分 待实现-->
-          <div class="checkresult" v-show="checkresult">
+          <div class="checkresult" v-show="id == 3" @click="checkresult">
             <el-table :data="voteData" style="width: 100%">
               <el-table-column prop="surf_id" label="Id" width="180">
               </el-table-column>
@@ -159,9 +159,14 @@ export default {
     },
     checkvote() {
       this.id = 2;
-      axios("http://localhost:8081/checkVote", username).then((res) => {
+      axios("http://localhost:8081/checkVote", {
+        params: {
+          user_id: User_id,
+          event_id: this.event_id,
+        },
+      }).then((res) => {
         this.voteData = res.data.surf_list;
-        //待实现：遍历surf_list，1的填上candidate+元素位置+1
+        //待实现：解密并遍历surf_list，1的填上candidate+元素位置+1
       });
     },
     checkresult() {
