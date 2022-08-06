@@ -121,6 +121,7 @@ export default {
       id: 1,
       event_id: "",
       username: "",
+      user_id: "",
       all_userid: [],
       all_vote: [],
     };
@@ -128,6 +129,7 @@ export default {
   created() {
     this.event_id = store.get("event").event_id;
     this.username = store.get("user").username;
+    this.user_id = store.get("user").user_id;
     axios(
       "http://localhost:8081/getsurf",
       event_id //根据本次投票查找数据库里的信息
@@ -161,7 +163,7 @@ export default {
       this.id = 2;
       axios("http://localhost:8081/checkVote", {
         params: {
-          user_id: User_id,
+          user_id: this.user_id, //自己的userid
           event_id: this.event_id,
         },
       }).then((res) => {
@@ -174,7 +176,7 @@ export default {
       axios.get("http://localhost:8081/checkResult", {
         params: {
           event_id: this.event_id,
-          all_userid: this.User_id,
+          all_userid: this.all_userid, //所有的userid
         }.then(function (response) {
           this.all_vote = response.data.all_vote;
           //待实现：解密投票向量
@@ -183,17 +185,27 @@ export default {
     },
     submit() {
       //生成投票向量
-      for (let i = 0; i < this.tableData.length; i++) {
-        if (this.tableData[i] == this.multipleSelection[i]) {
-          this.select[i] = 1;
-        } else {
-          this.select[i] = 0;
+      for (let i = 0; i < this.multipleSelection.length; i++) {
+        //遍历选项里的数据
+        for (let j = 0; j < this.tableData.length; j++) {
+          //遍历数据库中的键值对
+          if (this.tableData[j] == this.multipleSelection[i]) {
+            this.select[i] = 1;
+          } else {
+            this.select[i] = 0;
+          }
         }
       }
       let gooddata = JSON.stringify(this.select);
       let result = "";
       axios
-        .post("http://localhost:8081/vote", gooddata)
+        .post("http://localhost:8081/vote", {
+          params: {
+            vote: gooddata,
+            event_id: this.event_id,
+            username: this.username,
+          },
+        })
         .then(function (response) {
           result = response.data.vote_result;
         });

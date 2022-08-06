@@ -36,6 +36,7 @@
 
 <script>
 import qs from "qs";
+var store = require("store");
 const axios = require("axios");
 export default {
   name: "Login",
@@ -102,6 +103,7 @@ export default {
               console.log(response);
               dis = response.data.role_id;
               isvalid = response.isvalid;
+              store.set("user", response.data); //储存user对象到本地
             });
         } else {
           console.log("error submit!!");
